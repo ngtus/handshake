@@ -1,8 +1,8 @@
+      window.addEventListener("load", () => {
+    navigator.mediaDevices.getUserMedia({ video: false, audio: true }).then(function (stream) {
       const signalhub = require('signalhub')
       const createSwarm = require('webrtc-swarm')
 
-window.addEventListener("load", () => {
-    navigator.mediaDevices.getUserMedia({ video: false, audio: true }).then(function (stream) {
 
       const Player = require('./player.js')
       const canvas = require('./canvas')

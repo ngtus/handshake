@@ -1,11 +1,12 @@
 window.addEventListener("load", () => {
-    navigator.mediaDevices.getUserMedia({ video: false, audio: true }).then(function (stream) {
+    navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(function (stream) {
 
       const signalhub = require('signalhub')
       const createSwarm = require('webrtc-swarm')
 
       const Player = require('./player.js')
-      const canvas = require('./canvas')
+      //const canvas = require('./canvas')
+      
       const hub = signalhub('my-game', [
         'https://handshakesignalserver.herokuapp.com/'
       ])
@@ -20,11 +21,14 @@ window.addEventListener("load", () => {
       swarm.on('connect', function (peer, id) {
         if (!players[id]) {
           players[id] = new Player()
-          peer.on('data', function (data) {
+         peer.on('data', function (data) {
             data = JSON.parse(data.toString())
             players[id].update(data)
           })
-          players[id].addStream(peer.stream)
+          //peer.on('stream', stream => {
+            players[id].addStream(peer.stream)
+          //})
+ 
         }
       })
 

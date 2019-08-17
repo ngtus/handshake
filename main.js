@@ -1,5 +1,5 @@
       window.addEventListener("load", () => {
-    navigator.mediaDevices.getUserMedia({ video: false, audio: true }).then(function (stream) {
+    navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(function (stream) {
       const signalhub = require('signalhub')
       const createSwarm = require('webrtc-swarm')
 
@@ -38,7 +38,7 @@
       setInterval(function () {
         you.update()
         const youString = JSON.stringify(you)
-        swarm.peers.forEach(function (peer) {
+        swarm.peers.forEach(peer => {
           peer.send(youString)
         })
       }, 100)

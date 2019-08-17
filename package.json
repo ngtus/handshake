@@ -4,8 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "",
-    "signalhub": "signalhub listen -p 4000"
+    "start": "node index.js & watchify main.js -o bundle.js"
   },
   "keywords": [],
   "author": "",

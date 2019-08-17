@@ -1,10 +1,8 @@
 const express = require('express');
+const httpsLocalhost = require("https-localhost")
 
-const app = express();
+const app = httpsLocalhost()
 app.use(express.static('./'));
-
-//app.get('/', (req, res) => res.render('home'));
-
 
 app.listen(3000, () => console.log('Server started'))
 

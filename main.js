@@ -1,5 +1,6 @@
-      window.addEventListener("load", () => {
-    navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(function (stream) {
+window.addEventListener("load", () => {
+  navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+  .then(function (localStream) {
       const signalhub = require('signalhub')
       const swarm = require('webrtc-swarm')
 
@@ -10,24 +11,32 @@
         'https://handshakesignalserver.herokuapp.com/'
       ])
       const sw = swarm(hub, {
-        stream: stream
+        stream: localStream
       })
 
-      const you = new Player()
-      you.addStream(stream)
-      console.log(stream)
+      const localPlayer = new Player()
+      localPlayer.addStream(localStream)
+      console.log(localStream)
 
-sw.on('peer', function (peer, id) {
+sw.on('connect', function (peer, id) {
   console.log('connected to a new peer:', id)
   console.log('total peers:', sw.peers.length)
-  console.log(stream)
+  console.log(peer)
   console.log(peer.stream)
+  console.log(peer.uuid)
 })
 
 sw.on('disconnect', function (peer, id) {
   console.log('disconnected from a peer:', id)
   console.log('total peers:', sw.peers.length)
 })
+
+peer.on('stream', stream => {
+  console.log('fired onStream')
+})
+
+
+
 /*      const players = {}*/
       //sw.on('connect', function (peer, id) {
         //if (!players[id]) {
@@ -48,10 +57,10 @@ sw.on('disconnect', function (peer, id) {
       //})
 
       //setInterval(function () {
-        //you.update()
-        //const youString = JSON.stringify(you)
+        //localPlayer.update()
+        //const localPlayerString = JSON.stringify(localPlayer)
         //sw.peers.forEach(peer => {
-          //peer.send(youString)
+          //peer.send(localPlayerString)
         //})
       //}, 100)
 
@@ -59,16 +68,16 @@ sw.on('disconnect', function (peer, id) {
         //const speed = 16
         //switch (e.key) {
           //case 'a':
-            //you.x -= speed
+            //localPlayer.x -= speed
             //break
           //case 'd':
-            //you.x += speed
+            //localPlayer.x += speed
             //break
           //case 'w':
-            //you.y -= speed
+            //localPlayer.y -= speed
             //break
           //case 's':
-            //you.y += speed
+            //localPlayer.y += speed
             //break
         //}
       //}, false)

@@ -1,8 +1,8 @@
 window.addEventListener("load", () => {
-  navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-  .then(function (stream) {
+ navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+  .then(function (localStream) {
       const signalhub = require('signalhub')
-      const createSwarm = require('webrtc-swarm')
+      const swarm = require('webrtc-swarm')
 
 
       const Player = require('./player.js')
@@ -11,29 +11,33 @@ window.addEventListener("load", () => {
       const hub = signalhub('my-game', [
         'https://handshakesignalserver.herokuapp.com/'
       ])
-      const swarm = createSwarm(hub, {
-        stream: stream
+
+      const sw = swarm(hub, {
+        //stream: localStream
       })
 
-      const you = new Player()
-      you.addStream(stream)
+      const localPlayer = new Player()
+      localPlayer.addStream(localStream)
+      console.log(localStream)
 
       const players = {}
-      swarm.on('connect', function (peer, id) {
+      sw.on('connect', function (peer, id) {
         if (!players[id]) {
           players[id] = new Player()
          peer.on('data', function (data) {
             data = JSON.parse(data.toString())
             players[id].update(data)
           })
-          //peer.on('stream', stream => {
-            players[id].addStream(peer.stream)
-          //})
- 
+         peer.addStream(localStream)
+          console.log(peer)
+          peer.on('stream', stream => {
+            console.log(stream)
+            players[id].addStream(stream)
+          })
         }
       })
 
-      swarm.on('disconnect', function (peer, id) {
+      sw.on('disconnect', function (peer, id) {
         if (players[id]) {
           players[id].element.parentNode.removeChild(players[id].element)
           delete players[id]
@@ -41,10 +45,10 @@ window.addEventListener("load", () => {
       })
 
       setInterval(function () {
-        you.update()
-        const youString = JSON.stringify(you)
-        swarm.peers.forEach(peer => {
-          peer.send(youString)
+        localPlayer.update()
+        const localPlayerString = JSON.stringify(localPlayer)
+        sw.peers.forEach(peer => {
+          peer.send(localPlayerString)
         })
       }, 100)
 
@@ -52,16 +56,16 @@ window.addEventListener("load", () => {
         const speed = 16
         switch (e.key) {
           case 'a':
-            you.x -= speed
+            localPlayer.x -= speed
             break
           case 'd':
-            you.x += speed
+            localPlayer.x += speed
             break
           case 'w':
-            you.y -= speed
+            localPlayer.y -= speed
             break
           case 's':
-            you.y += speed
+            localPlayer.y += speed
             break
         }
       }, false)

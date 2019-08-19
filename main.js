@@ -10,77 +10,64 @@ window.addEventListener("load", () => {
       const hub = signalhub('my-game', [
         'https://handshakesignalserver.herokuapp.com/'
       ])
+
       const sw = swarm(hub, {
-        stream: localStream
+        //stream: localStream
       })
 
       const localPlayer = new Player()
       localPlayer.addStream(localStream)
       console.log(localStream)
 
-sw.on('connect', function (peer, id) {
-  console.log('connected to a new peer:', id)
-  console.log('total peers:', sw.peers.length)
-  console.log(peer)
-  console.log(peer.stream)
-  console.log(peer.uuid)
-})
+      const players = {}
+      sw.on('connect', function (peer, id) {
+        if (!players[id]) {
+          players[id] = new Player()
+          peer.on('data', function (data) {
+            data = JSON.parse(data.toString())
+            players[id].update(data)
+          })
+          peer.addStream(localStream)
+          console.log(peer)
+          peer.on('stream', stream => {
+            console.log(stream)
+            players[id].addStream(stream)
+          })
+        }
+      })
 
-sw.on('disconnect', function (peer, id) {
-  console.log('disconnected from a peer:', id)
-  console.log('total peers:', sw.peers.length)
-})
+      sw.on('disconnect', function (peer, id) {
+        if (players[id]) {
+          players[id].element.parentNode.removeChild(players[id].element)
+          delete players[id]
+        }
+      })
 
-peer.on('stream', stream => {
-  console.log('fired onStream')
-})
+      setInterval(function () {
+        localPlayer.update()
+        const localPlayerString = JSON.stringify(localPlayer)
+        sw.peers.forEach(peer => {
+          peer.send(localPlayerString)
+        })
+      }, 100)
 
-
-
-/*      const players = {}*/
-      //sw.on('connect', function (peer, id) {
-        //if (!players[id]) {
-          //players[id] = new Player()
-          //peer.on('data', function (data) {
-            //data = JSON.parse(data.toString())
-            //players[id].update(data)
-          //})
-          //players[id].addStream(peer.stream)
-        //}
-      //})
-
-      //sw.on('disconnect', function (peer, id) {
-        //if (players[id]) {
-          //players[id].element.parentNode.removeChild(players[id].element)
-          //delete players[id]
-        //}
-      //})
-
-      //setInterval(function () {
-        //localPlayer.update()
-        //const localPlayerString = JSON.stringify(localPlayer)
-        //sw.peers.forEach(peer => {
-          //peer.send(localPlayerString)
-        //})
-      //}, 100)
-
-      //document.addEventListener('keypress', function (e) {
-        //const speed = 16
-        //switch (e.key) {
-          //case 'a':
-            //localPlayer.x -= speed
-            //break
-          //case 'd':
-            //localPlayer.x += speed
-            //break
-          //case 'w':
-            //localPlayer.y -= speed
-            //break
-          //case 's':
-            //localPlayer.y += speed
-            //break
-        //}
-      //}, false)
+      document.addEventListener('keypress', function (e) {
+        const speed = 16
+        switch (e.key) {
+          case 'a':
+            localPlayer.x -= speed
+            break
+          case 'd':
+            localPlayer.x += speed
+            break
+          case 'w':
+            localPlayer.y -= speed
+            break
+          case 's':
+            localPlayer.y += speed
+            break
+        }
+      }, false)
 
     })
 })

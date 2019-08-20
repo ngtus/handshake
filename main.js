@@ -1,20 +1,24 @@
+const Player = require('./player.js')
 const signalhub = require('signalhub')
 const swarm = require('webrtc-swarm')
-
-
-const Player = require('./player.js')
-const canvas = require('./canvas')
+//const canvas = require('./canvas')
 const hub = signalhub('my-game', [
   'https://handshakesignalserver.herokuapp.com/'
 ])
-
 const sw = swarm(hub, { 
   //opts
 })
 
+const canvas = document.querySelector('#canvas') 
+const context = canvas.getContext("2d")
+//Set canvas size
+canvas.height = window.innerHeight
+canvas.width = window.innerWidth
+//variables 
+let painting = false
 
 window.addEventListener("load", () => {
-  navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+  navigator.mediaDevices.getUserMedia({ video: false, audio: true })
   .then( localStream => {
 
     const players = {}
@@ -28,7 +32,11 @@ window.addEventListener("load", () => {
         players[id] = new Player()
         peer.on('data', function (data) {
           data = JSON.parse(data.toString())
-          players[id].update(data)
+          if(data.color){
+            players[id].update(data)
+          }
+
+          updateCanvas(data)
         })
 
         peer.addStream(localStream)
@@ -46,6 +54,10 @@ window.addEventListener("load", () => {
         delete players[id]
       }
     })
+
+    canvas.addEventListener('mousedown', startPosition)
+    canvas.addEventListener('mouseup', finishedPosition)
+    canvas.addEventListener('mousemove', draw)
 
     document.addEventListener('keypress', event => {
       const speed = 16
@@ -73,3 +85,47 @@ window.addEventListener("load", () => {
     }, false)
   })
 })
+function startPosition(e){
+    painting = true
+    draw(e)
+}
+
+function finishedPosition(){
+  painting = false
+  context.beginPath()
+  sw.peers.forEach(peer => {
+    peer.send(JSON.stringify({painting: painting}))
+  })
+}
+
+
+function draw(e){
+    if (!painting) return
+    context.lineWidth = 9
+    context.lineCap = "round"
+    context.strokeStyle = "black"
+
+    context.lineTo(e.clientX, e.clientY)
+    context.stroke()
+    context.beginPath()
+    context.moveTo(e.clientX, e.clientY)
+
+    sw.peers.forEach(peer => {
+    peer.send(JSON.stringify({painting: painting, x: e.clientX, y: e.clientY }))
+    })
+}
+
+function updateCanvas(data){
+  if (!data.painting){
+    context.beginPath()
+    return
+  } 
+  context.lineWidth = 9
+  context.lineCap = "round"
+  context.strokeStyle = "black"
+
+  context.lineTo(data.x, data.y)
+  context.stroke()
+  context.beginPath()
+  context.moveTo(data.x, data.y)
+}

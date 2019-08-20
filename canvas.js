@@ -29,6 +29,8 @@
         context.beginPath()
         context.moveTo(e.clientX, e.clientY)
     }
+
+
     canvas.addEventListener('mousedown', startPosition)
     canvas.addEventListener('mouseup', finishedPosition)
     canvas.addEventListener('mousemove', draw)

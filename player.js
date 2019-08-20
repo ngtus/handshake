@@ -26,6 +26,7 @@ Player.prototype.update = function (data) {
   data = data || {}
   this.x = data.x || this.x
   this.y = data.y || this.y
+  this.color = data.color || this.color
   Object.assign(this.element.style, {
     top: this.y + 'px',
     left: this.x + 'px'

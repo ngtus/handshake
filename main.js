@@ -1,4 +1,5 @@
 const Player = require('./player.js')
+const $ = require('jquery')
 const signalhub = require('signalhub')
 const swarm = require('webrtc-swarm')
 //const canvas = require('./canvas')
@@ -16,6 +17,27 @@ canvas.height = window.innerHeight
 canvas.width = window.innerWidth
 //variables 
 let painting = false
+
+$( "#import" ).change(function() {
+  readURL(this)
+  })
+
+function readURL(input) {
+  if (input.files && input.files[0]) {
+    var reader = new FileReader();
+
+    reader.onload = function(e) {
+      //$('#image').attr('src', e.target.result);
+      base_image = new Image()
+      base_image.src = e.target.result
+      base_image.onload = function(){
+        context.drawImage(base_image, 0, 0)
+      }
+    }
+
+    reader.readAsDataURL(input.files[0]);
+  }
+}
 
 window.addEventListener("load", () => {
   navigator.mediaDevices.getUserMedia({ video: false, audio: true })

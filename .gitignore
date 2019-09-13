@@ -2,5 +2,3 @@ node_modules
 *.swp
 *.swo
 bundle.js
-*.png
-*.jpg

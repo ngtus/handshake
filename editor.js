@@ -31,3 +31,4 @@ let quill = new Quill('#editor', {
   theme: 'snow'
 })
 
+module.exports = quill

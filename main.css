@@ -16,12 +16,12 @@ html,body {
 
 #header {
   height: 40px;
-  background: gray;
+  background: white;
 }
 
 #footer {
   height: 40px;
-  background: gray;
+  background: white;
 }
 
 #editor-container {

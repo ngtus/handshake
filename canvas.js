@@ -1,3 +1,13 @@
+
+const canvas = document.querySelector('#canvas') 
+const context = canvas.getContext("2d")
+//Set canvas size
+canvas.height = window.innerHeight
+canvas.width = window.innerWidth
+//variables 
+let painting = false
+
+
     const canvas = document.querySelector('#canvas') 
     const context = canvas.getContext("2d")
 

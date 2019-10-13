@@ -2,11 +2,16 @@
   "name": "handshake",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
-    "start": "node index.js & watchify main.js -o bundle.js"
+    "start": "node server.js & watchify ./controller/main.js -o ./view/bundle.js"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "eslint": "^6.5.1",
+    "eslint-config-google": "^0.14.0"
+  },
+  "dependencies": {}
 }

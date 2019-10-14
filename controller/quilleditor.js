@@ -1,4 +1,7 @@
 const Quill = require('quill');
+const QuillCursors = require('quill-cursors');
+Quill.register('modules/cursors', QuillCursors);
+
 const toolbarOptions = [
   [{'font': []}],
   [{'size': ['small', false, 'large', 'huge']}],
@@ -27,6 +30,7 @@ const toolbarOptions = [
 const quill = new Quill('#editor', {
   modules: {
     toolbar: toolbarOptions,
+    cursors: true,
   },
   theme: 'snow',
 });

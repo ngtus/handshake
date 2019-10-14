@@ -2,6 +2,7 @@ const editor = require('./quilleditor.js');
 
 // TODO: Basic function (local insert, del, format)
 // TODO: Share session by link
+// TODO: change event handling quill.on method
 
 const signalhub = require('signalhub');
 const swarm = require('webrtc-swarm');
@@ -9,28 +10,39 @@ const hub = signalhub('app', [
   'https://handshakesignalserver.herokuapp.com/',
 ]);
 const sw = swarm(hub, {});
+const cursor = editor.getModule('cursors');
 
-/* const peerArr = []; */
 // const animals = [
 //   'leopard', 'rooster', 'kiwi', 'bear', 'deer', 'swan', 'bull',
-//   'python', 'panda', 'beetle', 'eagle', 'dolphin', 'beaver', 'koala', 'frog',
+//   'python', 'panda', 'beetle', 'eagle', 'dolphin', 'beaver', 'koala',
+//   'frog',
 // ];
+
 // const colors = [
-//   'white', 'silver', 'gray', 'black', 'red', 'maroon', 'yellow', 'olive',
-//   'lime', 'green', 'aqua', 'teal', 'blue', 'navy', 'fuchsia', 'purple',
-//   'pink',
-/* ]; */
+//   'black', 'silver', 'gray', 'maroon', 'red', 'purple',
+//   'fuchsia', 'green', 'lime', 'olive', 'yellow', 'navy', 'blue',
+//   'teal', 'aqua', 'orange',
+// ];
 
-
-console.log('me: ' + sw.me);
+console.log(sw);
+// cursor.createCursor(sw.me, sw.me, 'black');
 // peerArr.push(sw.me)
 
-sw.on('connect', function(peer, id) {
+sw.on('peer', function(peer, id) {
+  // const color = colors[Math.floor(Math.random()*colors.length)];
+  // const animal = animals[Math.floor(Math.random()*animals.length)];
+  // const name = color + animal;
+  // console.log(id + name + color)
+  const color = stringToColor(id);
+  cursor.createCursor(id, id, color);
   updatePeerList(id);
   peer.on('data', function(data) {
-    const change = JSON.parse(data);
-    console.log('received from ' + id + ': ' + data);
-    editor.insertText(change.index, change.text, 'api');
+    const delta = JSON.parse(data);
+    if (delta.id) {
+      cursor.moveCursor(delta.id, delta.range);
+    } else {
+      editor.updateContents(delta, 'api');
+    }
   });
 });
 
@@ -40,19 +52,6 @@ sw.on('disconnect', function(peer, id) {
 //    delete players[id]
 // }
 });
-
-document.addEventListener('keypress', (event) => {
-  const localString = String.fromCharCode(event.which);
-  console.log(localString);
-  /*  const localPlayerString = JSON.stringify(localPlayer)*/
-  const range = editor.getSelection();
-  sw.peers.forEach((peer )=> {
-    const localChange = {index: range.index, text: localString};
-    const localChangeString = JSON.stringify(localChange);
-    console.log(localChangeString);
-    peer.send(localChangeString);
-  });
-}, false);
 
 /**
  * updatePeerList
@@ -65,4 +64,40 @@ function updatePeerList(id) {
   const peerName = document.createTextNode(id + ';');
   item.appendChild(peerName);
   document.getElementById('peerList').appendChild(item);
+};
+
+
+editor.on('selection-change', function(range, oldRange, source) {
+  const data = JSON.stringify({id: sw.me, range: range});
+  sw.peers.forEach((peer)=> {
+    peer.send(data);
+  });
+});
+
+editor.on('text-change', function(delta, oldDelta, source) {
+  if (source == 'user') {
+    const data = JSON.stringify(delta);
+    sw.peers.forEach((peer)=> {
+      peer.send(data);
+    });
+  };
+});
+
+/**
+ * stringToColor
+ *
+ * @param {string} str
+ * @return {undefined}
+ */
+function stringToColor(str) {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  let color = '#';
+  for (let i = 0; i < 3; i++) {
+    const value = (hash >> (i * 8)) & 0xFF;
+    color += ('00' + value.toString(16)).substr(-2);
+  }
+  return color;
 }

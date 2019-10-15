@@ -2,7 +2,8 @@ const Quill = require('quill');
 const QuillCursors = require('quill-cursors');
 Quill.register('modules/cursors', QuillCursors);
 
-const toolbarOptions = [
+
+let toolbarOptions = [
   [{'font': []}],
   [{'size': ['small', false, 'large', 'huge']}],
 
@@ -26,6 +27,13 @@ const toolbarOptions = [
 
   ['clean'],
 ];
+
+const toolbar = document.getElementsByClassName('ql-toolbar');
+console.log(toolbar)
+
+if (!toolbar) {
+  toolbarOptions = false;
+};
 
 const quill = new Quill('#editor', {
   modules: {

@@ -1,5 +1,7 @@
 const editor = require('./quilleditor.js');
 
+// editor.clipboard.dangerouslyPasteHTML(0, content);
+
 // TODO: Basic function (local insert, del, format)
 // TODO: Share session by link
 // TODO: change event handling quill.on method
@@ -101,3 +103,24 @@ function stringToColor(str) {
   }
   return color;
 }
+
+const saveBtn = document.getElementById('saveBtn');
+saveBtn.onclick = saveFile;
+
+// setTimeout("create('Hello world!', 'myfile.txt', 'text/plain')");
+
+/**
+ * create
+ *
+ * @return {undefined}
+ */
+function saveFile() {
+  const content = editor.root.innerHTML;
+  console.log(content);
+  const name = 'saveFile.txt';
+  const type = 'text/plain';
+  const file = new Blob([content], {type: type});
+  saveBtn.href = URL.createObjectURL(file);
+  saveBtn.download = name;
+};
+

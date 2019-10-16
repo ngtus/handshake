@@ -38,7 +38,13 @@ if (!toolbar) {
 const quill = new Quill('#editor', {
   modules: {
     toolbar: toolbarOptions,
-    cursors: true,
+    // cursors: true,
+    cursors: {
+      // template: '<div class="custom-cursor">...</div>',
+      // hideDelayMs: 5000,
+      // hideSpeedMs: 0,
+      selectionChangeSource: null,
+    },
   },
   theme: 'snow',
 });

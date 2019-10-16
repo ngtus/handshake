@@ -1,8 +1,0 @@
-save quill quill.root.innerHtml
-
-- offline able
-- privacy
-
-- uudi
-
-fix that double bar thingy

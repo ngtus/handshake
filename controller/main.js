@@ -2,9 +2,16 @@ const editor = require('./quilleditor.js');
 
 // editor.clipboard.dangerouslyPasteHTML(0, content);
 
-// TODO: Basic function (local insert, del, format)
 // TODO: Share session by link
-// TODO: change event handling quill.on method
+// TODO: Named uuid instead of generated
+// TODO: Double top bar in offline mode
+// TODO: Show loading status
+// TODO: Show connection status
+// TODO: Update content for new node
+//
+// ============================================
+// IDEAS
+// - create new tabs and load content into new tabs
 
 const signalhub = require('signalhub');
 const swarm = require('webrtc-swarm');
@@ -39,11 +46,14 @@ sw.on('peer', function(peer, id) {
   cursor.createCursor(id, id, color);
   updatePeerList(id);
   peer.on('data', function(data) {
-    const delta = JSON.parse(data);
-    if (delta.id) {
-      cursor.moveCursor(delta.id, delta.range);
+    const parsedData = JSON.parse(data);
+    console.log(parsedData)
+    // if (delta.id && delta.source === 'user') {
+    if (parsedData.delta) {
+      editor.updateContents(parsedData.delta, 'api');
+      cursor.moveCursor(parsedData.id, parsedData.range);
     } else {
-      editor.updateContents(delta, 'api');
+      cursor.moveCursor(parsedData.id, parsedData.range);
     }
   });
 });
@@ -70,15 +80,25 @@ function updatePeerList(id) {
 
 
 editor.on('selection-change', function(range, oldRange, source) {
-  const data = JSON.stringify({id: sw.me, range: range});
-  sw.peers.forEach((peer)=> {
-    peer.send(data);
-  });
+  if (source === 'user') {
+    console.log('user selection-change');
+    const data = JSON.stringify({id: sw.me, range: range});
+    sw.peers.forEach((peer)=> {
+      peer.send(data);
+    });
+  } else {
+    console.log(source);
+    console.log('selection-change');
+  };
 });
 
 editor.on('text-change', function(delta, oldDelta, source) {
-  if (source == 'user') {
-    const data = JSON.stringify(delta);
+  if (source === 'api') {
+    console.log('api text-change');
+  } else {
+    console.log('user text-change');
+    const range = editor.getSelection();
+    const data = JSON.stringify({delta: delta, id: sw.me, range: range});
     sw.peers.forEach((peer)=> {
       peer.send(data);
     });
@@ -123,4 +143,17 @@ function saveFile() {
   saveBtn.href = URL.createObjectURL(file);
   saveBtn.download = name;
 };
+
+const openBtn = document.getElementById('openBtn');
+openBtn.onclick = openFile;
+
+/**
+ * openFile
+ *
+ * @return {undefined}
+ */
+function openFile() {
+  const inputFile = document.getElementById('inputFile');
+  inputFile.click();
+}
 

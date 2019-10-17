@@ -8,10 +8,12 @@ const editor = require('./quilleditor.js');
 // TODO: Show loading status
 // TODO: Show connection status
 // TODO: Update content for new node
+// TODO: Read local txt file
 //
 // ============================================
 // IDEAS
 // - create new tabs and load content into new tabs
+// - Dropbox: Drag and drop
 
 const signalhub = require('signalhub');
 const swarm = require('webrtc-swarm');
@@ -39,15 +41,11 @@ console.log(sw);
 
 sw.on('peer', function(peer, id) {
   // const color = colors[Math.floor(Math.random()*colors.length)];
-  // const animal = animals[Math.floor(Math.random()*animals.length)];
-  // const name = color + animal;
-  // console.log(id + name + color)
   const color = stringToColor(id);
   cursor.createCursor(id, id, color);
   updatePeerList(id);
   peer.on('data', function(data) {
     const parsedData = JSON.parse(data);
-    console.log(parsedData)
     // if (delta.id && delta.source === 'user') {
     if (parsedData.delta) {
       editor.updateContents(parsedData.delta, 'api');
@@ -125,18 +123,8 @@ function stringToColor(str) {
 }
 
 const saveBtn = document.getElementById('saveBtn');
-saveBtn.onclick = saveFile;
-
-// setTimeout("create('Hello world!', 'myfile.txt', 'text/plain')");
-
-/**
- * create
- *
- * @return {undefined}
- */
-function saveFile() {
+saveBtn.onclick = function() {
   const content = editor.root.innerHTML;
-  console.log(content);
   const name = 'saveFile.txt';
   const type = 'text/plain';
   const file = new Blob([content], {type: type});
@@ -145,15 +133,69 @@ function saveFile() {
 };
 
 const openBtn = document.getElementById('openBtn');
-openBtn.onclick = openFile;
-
-/**
- * openFile
- *
- * @return {undefined}
- */
-function openFile() {
-  const inputFile = document.getElementById('inputFile');
+const inputFile = document.getElementById('inputFile');
+openBtn.onclick = function() {
   inputFile.click();
+  inputFile.onchange = function(event) {
+    handleFiles(inputFile.files);
+    // const input = inputFile.files[0];
+    // const reader = new FileReader();
+    // reader.onload = function() {
+    //   const data = reader.result;
+    //   console.log(data);
+    // };
+    // reader.readAsText(input);
+  };
+};
+
+const dropbox = document.getElementById('container');
+dropbox.addEventListener('dragenter', dragenter, false);
+dropbox.addEventListener('dragover', dragover, false);
+dropbox.addEventListener('drop', drop, false);
+
+function dragenter(e) {
+  e.stopPropagation();
+  e.preventDefault();
 }
 
+function dragover(e) {
+  e.stopPropagation();
+  e.preventDefault();
+}
+
+function drop(e) {
+  e.stopPropagation();
+  e.preventDefault();
+
+  const dt = e.dataTransfer;
+  const files = dt.files;
+  handleFiles(files);
+}
+
+/**
+ * handleFiles
+ *
+ * @param {files} files
+ * @return {undefined}
+ */
+function handleFiles(files) {
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+
+    if (!file.type.startsWith('text/')) {
+      continue;
+    };
+
+    // const img = document.createElement("img");
+    // img.classList.add("obj");
+    // img.file = file;
+    // preview.appendChild(img); // Assuming that "preview" is the div output where the content will be displayed.
+
+    const reader = new FileReader();
+    reader.onload = function() {
+      const data = reader.result;
+      console.log(data);
+    };
+    reader.readAsText(file);
+  }
+}

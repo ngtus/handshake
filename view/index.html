@@ -12,8 +12,8 @@
 <!-- Latest compiled and minified CSS -->
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
 
-<!-- Optional theme -->
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap-theme.min.css" integrity="sha384-6pzBo3FDv/PJ8r2KRkGHifhEocL+1X2rVCTTkUfGk7/0pbek5mMa1upzvWbrUbOZ" crossorigin="anonymous">
+<!-- [> Optional theme <] -->
+<!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap-theme.min.css" integrity="sha384-6pzBo3FDv/PJ8r2KRkGHifhEocL+1X2rVCTTkUfGk7/0pbek5mMa1upzvWbrUbOZ" crossorigin="anonymous"> -->
 
 </head>
 <body>
@@ -36,8 +36,26 @@
     <!-- Collect the nav links, forms, and other content for toggling -->
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav">
+
         <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown </a>
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">File </a>
+          <ul class="dropdown-menu">
+            
+            <li><a href="javascript:void(0)" id="saveBtn">Save</a></li>
+            <li><input id="inputFile" type="file" accept=".txt" multiple/> <a href="javascript:void(0)"" id="openBtn">Open</a></li>
+            <!-- <li><input type="file" id="file-input" /></li> -->
+            <li><a href="#">Action</a></li>
+            <li><a href="#">Another action</a></li>
+            <li><a href="#">Something else here</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="#">Separated link</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="#">One more separated link</a></li>
+          </ul>
+        </li>
+
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Edit </a>
           <ul class="dropdown-menu">
             <li><a href="#">Action</a></li>
             <li><a href="#">Another action</a></li>
@@ -49,27 +67,32 @@
           </ul>
         </li>
       </ul>
-      <ul class="nav navbar-nav navbar-right">
-        <li><a href="#">Link</a></li>
-        <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
-          <ul class="dropdown-menu">
-            <li><a href="#">Action</a></li>
-            <li><a href="#">Another action</a></li>
-            <li><a href="#">Something else here</a></li>
-            <li role="separator" class="divider"></li>
-            <li><a href="#">Separated link</a></li>
-          </ul>
-        </li>
-      </ul>
+
+      <!-- <ul class="nav navbar-nav navbar-right"> -->
+      <!--   <li><a href="#">Link</a></li> -->
+      <!--   <li class="dropdown"> -->
+      <!--     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a> -->
+      <!--     <ul class="dropdown-menu"> -->
+      <!--       <li><a href="#">Action</a></li> -->
+      <!--       <li><a href="#">Another action</a></li> -->
+      <!--       <li><a href="#">Something else here</a></li> -->
+      <!--       <li role="separator" class="divider"></li> -->
+      <!--       <li><a href="#">Separated link</a></li> -->
+      <!--     </ul> -->
+      <!--   </li> -->
+      <!-- </ul> -->
+
     </div><!-- /.navbar-collapse -->
   </div><!-- /.container-fluid -->
 </nav>
 
+<ul class="nav nav-tabs">
+  <li class="active"><a href="#">Home</a></li>
+  <li><a href="#">Menu 1</a></li>
+  <li><a href="#">Menu 2</a></li>
+  <li><a href="#">Menu 3</a></li>
+</ul>
 
-  <!-- <div id="header"> -->
-  <!--   <a href="javascript:void(0)" id="saveBtn"><button>Save</button></a> -->
-  <!-- </div> -->
 <div id="editor-container">
   <div id="editor">
    <p>Hello World!</p>

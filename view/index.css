@@ -3,6 +3,18 @@ html,body {
   height: 100%;
 }
 
+.navbar.navbar-default{
+  margin-bottom: 0px;
+  background: white;
+}
+.ql-toolbar.ql-snow{
+  /* background-color: #f8f8f8; */
+}
+
+#inputFile{
+    display:none
+}
+
 * {
   box-sizing: border-box;
 }

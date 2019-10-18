@@ -4,16 +4,13 @@ const editor = require('./quilleditor.js');
 
 // TODO: Share session by link
 // TODO: Named uuid instead of generated
-// TODO: Double top bar in offline mode
 // TODO: Show loading status
 // TODO: Show connection status
 // TODO: Update content for new node
-// TODO: Read local txt file
 //
 // ============================================
 // IDEAS
 // - create new tabs and load content into new tabs
-// - Dropbox: Drag and drop
 
 const signalhub = require('signalhub');
 const swarm = require('webrtc-swarm');
@@ -186,7 +183,7 @@ function handleFiles(files) {
       continue;
     };
 
-    // const img = document.createElement("img");
+    // const img = document.getElementById('img');
     // img.classList.add("obj");
     // img.file = file;
     // preview.appendChild(img); // Assuming that "preview" is the div output where the content will be displayed.
@@ -195,6 +192,7 @@ function handleFiles(files) {
     reader.onload = function() {
       const data = reader.result;
       console.log(data);
+      editor.clipboard.dangerouslyPasteHTML(0, data, 'api');
     };
     reader.readAsText(file);
   }

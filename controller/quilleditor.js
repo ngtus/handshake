@@ -31,13 +31,14 @@ let toolbarOptions = [
 const toolbar = document.getElementsByClassName('ql-toolbar');
 console.log(toolbar)
 
-if (!toolbar) {
-  toolbarOptions = false;
-};
+// if (!toolbar) {
+//   toolbarOptions = false;
+// };
 
 const quill = new Quill('#editor', {
   modules: {
-    toolbar: toolbarOptions,
+    toolbar: '#toolbar',
+    // toolbar: toolbarOptions,
     // cursors: true,
     cursors: {
       // template: '<div class="custom-cursor">...</div>',

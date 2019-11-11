@@ -1,14 +1,15 @@
 const editor = require('./quilleditor.js');
 
-// editor.clipboard.dangerouslyPasteHTML(0, content);
-
 // TODO: Share session by link
 // TODO: Named uuid instead of generated
 // TODO: Show loading status
 // TODO: Show connection status
 // TODO: Update content for new node
+// TODO: lseq
+// TODO: version vector with exception
 //
 // ============================================
+//
 // IDEAS
 // - create new tabs and load content into new tabs
 
@@ -54,10 +55,10 @@ sw.on('peer', function(peer, id) {
 });
 
 sw.on('disconnect', function(peer, id) {
-//   if (players[id]) {
-//    players[id].element.parentnode.removechild(players[id].element)
-//    delete players[id]
-// }
+  console.log('peer disconnected');
+  console.log(id)
+  // cursor.removeCursor(id);
+  // removeFromPeerList(id);
 });
 
 /**
@@ -73,10 +74,25 @@ function updatePeerList(id) {
   document.getElementById('peerList').appendChild(item);
 };
 
+/**
+ * removeFromPeerList
+ *
+ * @param {number} id
+ * @return {undefined}
+ */
+function removeFromPeerList(id) {
+  // const list = document.getElementById('peerList');
+  console.log('peer disconnected');
+  // for (let i = 0; i < list.length; i++ ){
+  //   list.removeChild(list.childNodes[0]);  
+  // }
+}
+
 
 editor.on('selection-change', function(range, oldRange, source) {
   if (source === 'user') {
     console.log('user selection-change');
+    console.log(sw)
     const data = JSON.stringify({id: sw.me, range: range});
     sw.peers.forEach((peer)=> {
       peer.send(data);
@@ -92,6 +108,7 @@ editor.on('text-change', function(delta, oldDelta, source) {
     console.log('api text-change');
   } else {
     console.log('user text-change');
+    sw.close()
     const range = editor.getSelection();
     const data = JSON.stringify({delta: delta, id: sw.me, range: range});
     sw.peers.forEach((peer)=> {
@@ -192,6 +209,7 @@ function handleFiles(files) {
     reader.onload = function() {
       const data = reader.result;
       console.log(data);
+      editor.setContents([]);
       editor.clipboard.dangerouslyPasteHTML(0, data, 'api');
     };
     reader.readAsText(file);

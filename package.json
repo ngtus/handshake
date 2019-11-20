@@ -4,7 +4,9 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js & watchify ./controller/main.js -o ./view/bundle.js"
+    "start": "node server.js & watchify ./controller/main.js -o ./view/bundle.js",
+    "signalhub": "signalhub listen -p 8080"
+
   },
   "keywords": [],
   "author": "",

@@ -15,10 +15,12 @@ const editor = require('./quilleditor.js');
 
 const signalhub = require('signalhub');
 const swarm = require('webrtc-swarm');
-const hub = signalhub('app', [
+const hub = signalhub('app1', [
   'https://handshakesignalserver.herokuapp.com/',
 ]);
-const sw = swarm(hub, {});
+console.log(hub)
+
+const sw = swarm(hub, { });
 const cursor = editor.getModule('cursors');
 
 // const animals = [
@@ -37,7 +39,7 @@ console.log(sw);
 // cursor.createCursor(sw.me, sw.me, 'black');
 // peerArr.push(sw.me)
 
-sw.on('peer', function(peer, id) {
+sw.on('connect', function(peer, id) {
   // const color = colors[Math.floor(Math.random()*colors.length)];
   const color = stringToColor(id);
   cursor.createCursor(id, id, color);
@@ -55,10 +57,8 @@ sw.on('peer', function(peer, id) {
 });
 
 sw.on('disconnect', function(peer, id) {
-  console.log('peer disconnected');
-  console.log(id)
   // cursor.removeCursor(id);
-  // removeFromPeerList(id);
+  removeFromPeerList(id);
 });
 
 /**
@@ -69,7 +69,7 @@ sw.on('disconnect', function(peer, id) {
  */
 function updatePeerList(id) {
   const item = document.createElement('a');
-  const peerName = document.createTextNode(id + ';');
+  const peerName = document.createTextNode(id);
   item.appendChild(peerName);
   document.getElementById('peerList').appendChild(item);
 };
@@ -81,18 +81,18 @@ function updatePeerList(id) {
  * @return {undefined}
  */
 function removeFromPeerList(id) {
-  // const list = document.getElementById('peerList');
-  console.log('peer disconnected');
-  // for (let i = 0; i < list.length; i++ ){
-  //   list.removeChild(list.childNodes[0]);  
-  // }
+  const list = document.getElementById('peerList');
+  for (let i = 0; i < list.childNodes.length; i++ ) {
+    if (list.childNodes[i].textContent === id) {
+      list.removeChild(list.childNodes[i]);
+    }
+  }
 }
 
 
 editor.on('selection-change', function(range, oldRange, source) {
   if (source === 'user') {
     console.log('user selection-change');
-    console.log(sw)
     const data = JSON.stringify({id: sw.me, range: range});
     sw.peers.forEach((peer)=> {
       peer.send(data);
@@ -108,7 +108,6 @@ editor.on('text-change', function(delta, oldDelta, source) {
     console.log('api text-change');
   } else {
     console.log('user text-change');
-    sw.close()
     const range = editor.getSelection();
     const data = JSON.stringify({delta: delta, id: sw.me, range: range});
     sw.peers.forEach((peer)=> {
@@ -215,3 +214,4 @@ function handleFiles(files) {
     reader.readAsText(file);
   }
 }
+

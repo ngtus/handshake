@@ -15,32 +15,36 @@ const editor = require('./quilleditor.js');
 
 const signalhub = require('signalhub');
 const swarm = require('webrtc-swarm');
-const hub = signalhub('app1', [
+
+const session = getSession();
+const hub = signalhub(session, [
   'https://handshakesignalserver.herokuapp.com/',
 ]);
-console.log(hub)
 
 const sw = swarm(hub, { });
 const cursor = editor.getModule('cursors');
 
-// const animals = [
-//   'leopard', 'rooster', 'kiwi', 'bear', 'deer', 'swan', 'bull',
-//   'python', 'panda', 'beetle', 'eagle', 'dolphin', 'beaver', 'koala',
-//   'frog',
-// ];
-
-// const colors = [
-//   'black', 'silver', 'gray', 'maroon', 'red', 'purple',
-//   'fuchsia', 'green', 'lime', 'olive', 'yellow', 'navy', 'blue',
-//   'teal', 'aqua', 'orange',
-// ];
-
+/**
+ * getSession
+ *
+ * @return {string}
+ */
+function getSession() {
+  const urlParams = new URLSearchParams(window.location.search);
+  let session = '';
+  if (urlParams.has('session')) {
+    session = urlParams.get('session');
+  } else {
+    session = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    document.getElementById('sharingUrl').value = window.location.href + '?session=' + session;
+  }
+  return session;
+}
 console.log(sw);
 // cursor.createCursor(sw.me, sw.me, 'black');
 // peerArr.push(sw.me)
 
 sw.on('connect', function(peer, id) {
-  // const color = colors[Math.floor(Math.random()*colors.length)];
   const color = stringToColor(id);
   cursor.createCursor(id, id, color);
   updatePeerList(id);
@@ -68,10 +72,18 @@ sw.on('disconnect', function(peer, id) {
  * @return {undefined}
  */
 function updatePeerList(id) {
-  const item = document.createElement('a');
+  const peers = document.getElementById('peers');
+  peers.setAttribute('style', 'color: blue');
+  const color = 'background-color: ' + stringToColor(id);
+  const li = document.createElement('li');
+  const a = document.createElement('a');
   const peerName = document.createTextNode(id);
-  item.appendChild(peerName);
-  document.getElementById('peerList').appendChild(item);
+  a.appendChild(peerName);
+  a.setAttribute('style', 'color: white');
+  console.log(a)
+  li.appendChild(a);
+  li.setAttribute('style', color);
+  document.getElementById('peerList').appendChild(li);
 };
 
 /**
@@ -81,6 +93,8 @@ function updatePeerList(id) {
  * @return {undefined}
  */
 function removeFromPeerList(id) {
+  const peers = document.getElementById('peers');
+  peers.setAttribute('style', 'color: #777');
   const list = document.getElementById('peerList');
   for (let i = 0; i < list.childNodes.length; i++ ) {
     if (list.childNodes[i].textContent === id) {
@@ -199,11 +213,6 @@ function handleFiles(files) {
       continue;
     };
 
-    // const img = document.getElementById('img');
-    // img.classList.add("obj");
-    // img.file = file;
-    // preview.appendChild(img); // Assuming that "preview" is the div output where the content will be displayed.
-
     const reader = new FileReader();
     reader.onload = function() {
       const data = reader.result;
@@ -215,3 +224,10 @@ function handleFiles(files) {
   }
 }
 
+const copyUrlBtn = document.getElementById('copyUrlBtn');
+copyUrlBtn.addEventListener('click', function() {
+  const copyText = document.getElementById('sharingUrl');
+  copyText.select();
+  copyText.setSelectionRange(0, 99999);
+  document.execCommand('copy');
+});

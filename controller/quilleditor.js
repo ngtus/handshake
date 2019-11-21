@@ -40,8 +40,8 @@ const quill = new Quill('#editor', {
     // cursors: true,
     cursors: {
       // template: '<div class="custom-cursor">...</div>',
-      // hideDelayMs: 5000,
-      // hideSpeedMs: 0,
+      hideDelayMs: 8000,
+      hideSpeedMs: 400,
       selectionChangeSource: null,
     },
   },

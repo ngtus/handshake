@@ -149,6 +149,11 @@ function stringToColor(str) {
   return color;
 }
 
+const newBtn = document.getElementById('newBtn');
+newBtn.onclick = function() {
+  window.open('http://localhost:3000', '_blank');
+}
+
 const saveBtn = document.getElementById('saveBtn');
 saveBtn.onclick = function() {
   const content = editor.root.innerHTML;

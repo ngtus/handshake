@@ -1,6 +1,7 @@
 # Name
 
 This project is a peer-to-peer real-time collaborative text editor
+URL: https://github.com/ngtus/handshake/tree/session
 
 ## Installation
 

@@ -24,25 +24,6 @@ const hub = signalhub(session, [
 const sw = swarm(hub, { });
 const cursor = editor.getModule('cursors');
 
-/**
- * getSession
- *
- * @return {string}
- */
-function getSession() {
-  const urlParams = new URLSearchParams(window.location.search);
-  let session = '';
-  if (urlParams.has('session')) {
-    session = urlParams.get('session');
-  } else {
-    session = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-    document.getElementById('sharingUrl').value = window.location.href + '?session=' + session;
-  }
-  return session;
-}
-console.log(sw);
-// cursor.createCursor(sw.me, sw.me, 'black');
-// peerArr.push(sw.me)
 
 sw.on('connect', function(peer, id) {
   const color = stringToColor(id);
@@ -64,45 +45,6 @@ sw.on('disconnect', function(peer, id) {
   // cursor.removeCursor(id);
   removeFromPeerList(id);
 });
-
-/**
- * updatePeerList
- *
- * @param {number} id
- * @return {undefined}
- */
-function updatePeerList(id) {
-  const peers = document.getElementById('peers');
-  peers.setAttribute('style', 'color: blue');
-  const color = 'background-color: ' + stringToColor(id);
-  const li = document.createElement('li');
-  const a = document.createElement('a');
-  const peerName = document.createTextNode(id);
-  a.appendChild(peerName);
-  a.setAttribute('style', 'color: white');
-  console.log(a)
-  li.appendChild(a);
-  li.setAttribute('style', color);
-  document.getElementById('peerList').appendChild(li);
-};
-
-/**
- * removeFromPeerList
- *
- * @param {number} id
- * @return {undefined}
- */
-function removeFromPeerList(id) {
-  const peers = document.getElementById('peers');
-  peers.setAttribute('style', 'color: #777');
-  const list = document.getElementById('peerList');
-  for (let i = 0; i < list.childNodes.length; i++ ) {
-    if (list.childNodes[i].textContent === id) {
-      list.removeChild(list.childNodes[i]);
-    }
-  }
-}
-
 
 editor.on('selection-change', function(range, oldRange, source) {
   if (source === 'user') {
@@ -131,6 +73,60 @@ editor.on('text-change', function(delta, oldDelta, source) {
 });
 
 /**
+ * getSession
+ *
+ * @return {string}
+ */
+function getSession() {
+  const urlParams = new URLSearchParams(window.location.search);
+  let session = '';
+  if (urlParams.has('session')) {
+    session = urlParams.get('session');
+  } else {
+    session = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    document.getElementById('sharingUrl').value = window.location.href + '?session=' + session;
+  }
+  return session;
+}
+
+/**
+ * updatePeerList
+ *
+ * @param {number} id
+ * @return {undefined}
+ */
+function updatePeerList(id) {
+  const peers = document.getElementById('peers');
+  peers.setAttribute('style', 'color: blue');
+  const color = 'background-color: ' + stringToColor(id);
+  const li = document.createElement('li');
+  const a = document.createElement('a');
+  const peerName = document.createTextNode(id);
+  a.appendChild(peerName);
+  a.setAttribute('style', 'color: white');
+  li.appendChild(a);
+  li.setAttribute('style', color);
+  document.getElementById('peerList').appendChild(li);
+};
+
+/**
+ * removeFromPeerList
+ *
+ * @param {number} id
+ * @return {undefined}
+ */
+function removeFromPeerList(id) {
+  const peers = document.getElementById('peers');
+  peers.setAttribute('style', 'color: #777');
+  const list = document.getElementById('peerList');
+  for (let i = 0; i < list.childNodes.length; i++ ) {
+    if (list.childNodes[i].textContent === id) {
+      list.removeChild(list.childNodes[i]);
+    }
+  }
+}
+
+/**
  * stringToColor
  *
  * @param {string} str
@@ -152,7 +148,7 @@ function stringToColor(str) {
 const newBtn = document.getElementById('newBtn');
 newBtn.onclick = function() {
   window.open('http://localhost:3000', '_blank');
-}
+};
 
 const saveBtn = document.getElementById('saveBtn');
 saveBtn.onclick = function() {
@@ -180,21 +176,47 @@ openBtn.onclick = function() {
   };
 };
 
+const copyUrlBtn = document.getElementById('copyUrlBtn');
+copyUrlBtn.addEventListener('click', function() {
+  const copyText = document.getElementById('sharingUrl');
+  copyText.select();
+  copyText.setSelectionRange(0, 99999);
+  document.execCommand('copy');
+});
+
 const dropbox = document.getElementById('container');
 dropbox.addEventListener('dragenter', dragenter, false);
 dropbox.addEventListener('dragover', dragover, false);
 dropbox.addEventListener('drop', drop, false);
 
+/**
+ * dragenter
+ *
+ * @param {event} e
+ * @return {undefined}
+ */
 function dragenter(e) {
   e.stopPropagation();
   e.preventDefault();
 }
 
+/**
+ * dragover
+ *
+ * @param {event} e
+ * @return {undefined}
+ */
 function dragover(e) {
   e.stopPropagation();
   e.preventDefault();
 }
 
+/**
+ * drop
+ *
+ * @param {event} e
+ * @return {undefined}
+ */
 function drop(e) {
   e.stopPropagation();
   e.preventDefault();
@@ -229,10 +251,3 @@ function handleFiles(files) {
   }
 }
 
-const copyUrlBtn = document.getElementById('copyUrlBtn');
-copyUrlBtn.addEventListener('click', function() {
-  const copyText = document.getElementById('sharingUrl');
-  copyText.select();
-  copyText.setSelectionRange(0, 99999);
-  document.execCommand('copy');
-});

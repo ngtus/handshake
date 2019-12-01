@@ -1,3 +1,4 @@
+const Automerge = require('automerge');
 const editor = require('./quilleditor.js');
 
 // TODO: Share session by link
@@ -24,16 +25,26 @@ const hub = signalhub(session, [
 const sw = swarm(hub, { });
 const cursor = editor.getModule('cursors');
 
+const delta = editor.getContents();
+let localDoc = Automerge.from(delta);
+let remoteDoc = Automerge.init();
+remoteDoc = Automerge.merge(remoteDoc, localDoc);
 
 sw.on('connect', function(peer, id) {
   const color = stringToColor(id);
   cursor.createCursor(id, id, color);
   updatePeerList(id);
+
   peer.on('data', function(data) {
     const parsedData = JSON.parse(data);
     // if (delta.id && delta.source === 'user') {
     if (parsedData.delta) {
-      editor.updateContents(parsedData.delta, 'api');
+      remoteDoc = Automerge.change(remoteDoc, (doc) => {
+        doc.delta = parsedData.delta;
+      })
+      const finalDoc = Automerge.merge(localDoc, remoteDoc);
+      editor.updateContents(finalDoc.delta, 'api');
+      // editor.updateContents(parsedData.delta, 'api');
       cursor.moveCursor(parsedData.id, parsedData.range);
     } else {
       cursor.moveCursor(parsedData.id, parsedData.range);
@@ -42,13 +53,12 @@ sw.on('connect', function(peer, id) {
 });
 
 sw.on('disconnect', function(peer, id) {
-  // cursor.removeCursor(id);
+  cursor.removeCursor(id);
   removeFromPeerList(id);
 });
 
 editor.on('selection-change', function(range, oldRange, source) {
   if (source === 'user') {
-    console.log('user selection-change');
     const data = JSON.stringify({id: sw.me, range: range});
     sw.peers.forEach((peer)=> {
       peer.send(data);
@@ -64,6 +74,9 @@ editor.on('text-change', function(delta, oldDelta, source) {
     console.log('api text-change');
   } else {
     console.log('user text-change');
+    localDoc = Automerge.change(localDoc, (doc)=> {
+      doc.delta = delta;
+    });
     const range = editor.getSelection();
     const data = JSON.stringify({delta: delta, id: sw.me, range: range});
     sw.peers.forEach((peer)=> {
@@ -84,7 +97,9 @@ function getSession() {
     session = urlParams.get('session');
   } else {
     session = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-    document.getElementById('sharingUrl').value = window.location.href + '?session=' + session;
+    const sharingURL = window.location.href + '?session=' + session;
+    document.getElementById('sharingUrl').value = sharingURL;
+    history.pushState({}, null, sharingURL);
   }
   return session;
 }
@@ -243,7 +258,6 @@ function handleFiles(files) {
     const reader = new FileReader();
     reader.onload = function() {
       const data = reader.result;
-      console.log(data);
       editor.setContents([]);
       editor.clipboard.dangerouslyPasteHTML(0, data, 'api');
     };

@@ -27,8 +27,7 @@ const cursor = editor.getModule('cursors');
 
 const delta = editor.getContents();
 let localDoc = Automerge.from(delta);
-let remoteDoc = Automerge.init();
-remoteDoc = Automerge.merge(remoteDoc, localDoc);
+let remoteDoc = Automerge.init(delta);
 
 sw.on('connect', function(peer, id) {
   const color = stringToColor(id);
@@ -41,9 +40,14 @@ sw.on('connect', function(peer, id) {
     if (parsedData.delta) {
       remoteDoc = Automerge.change(remoteDoc, (doc) => {
         doc.delta = parsedData.delta;
-      })
-      const finalDoc = Automerge.merge(localDoc, remoteDoc);
-      editor.updateContents(finalDoc.delta, 'api');
+      });
+      console.log('local delta')
+      console.log(localDoc.delta)
+      console.log('remote delta')
+      console.log(remoteDoc.delta)
+      localDoc = Automerge.merge(localDoc, remoteDoc);
+      console.log(localDoc.delta)
+      editor.updateContents(localDoc.delta, 'api');
       // editor.updateContents(parsedData.delta, 'api');
       cursor.moveCursor(parsedData.id, parsedData.range);
     } else {
@@ -75,7 +79,7 @@ editor.on('text-change', function(delta, oldDelta, source) {
   } else {
     console.log('user text-change');
     localDoc = Automerge.change(localDoc, (doc)=> {
-      doc.delta = delta;
+      doc.delta = editor.getContents();
     });
     const range = editor.getSelection();
     const data = JSON.stringify({delta: delta, id: sw.me, range: range});

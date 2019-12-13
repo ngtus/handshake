@@ -47,8 +47,8 @@ sw.on('connect', function(peer, id) {
       console.log(remoteDoc.delta)
       localDoc = Automerge.merge(localDoc, remoteDoc);
       console.log(localDoc.delta)
-      editor.updateContents(localDoc.delta, 'api');
-      // editor.updateContents(parsedData.delta, 'api');
+      // editor.updateContents(localDoc.delta, 'api');
+      editor.updateContents(parsedData.delta, 'api');
       cursor.moveCursor(parsedData.id, parsedData.range);
     } else {
       cursor.moveCursor(parsedData.id, parsedData.range);
@@ -263,7 +263,7 @@ function handleFiles(files) {
     reader.onload = function() {
       const data = reader.result;
       editor.setContents([]);
-      editor.clipboard.dangerouslyPasteHTML(0, data, 'api');
+      editor.clipboard.dangerouslyPasteHTML(0, data, 'user');
     };
     reader.readAsText(file);
   }
